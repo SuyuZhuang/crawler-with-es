@@ -3,6 +3,7 @@ package com.github.hcsp;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -14,7 +15,7 @@ import java.util.List;
 import java.util.Set;
 
 public class Main {
-    public static OkHttpClient client = new OkHttpClient();
+    public static final OkHttpClient client = new OkHttpClient();
 
     public static void main(String[] args) throws IOException {
         // 待处理的链接池
@@ -60,8 +61,10 @@ public class Main {
                 .build();
 
         try (Response response = client.newCall(request).execute()) {
-            String html = response.body().string();
-            doc = Jsoup.parse(html);
+            ResponseBody body = response.body();
+            if (body != null) {
+                doc = Jsoup.parse(body.string());
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
