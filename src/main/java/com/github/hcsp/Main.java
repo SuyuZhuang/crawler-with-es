@@ -16,7 +16,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
 
 public class Main {
     private static final OkHttpClient client = new OkHttpClient();
@@ -25,15 +24,22 @@ public class Main {
     private static final String JDBC_URL = "jdbc:h2:file:E:\\study\\xiedaimala\\gitpractice\\crawler-with-es\\news";
 
 
-    private static List<String> loadUrlsFromDatabase(Connection connection, String sql) throws SQLException {
-        List<String> linkPool = new ArrayList<>();
+    private static String getNextLink(Connection connection, String sql) throws SQLException {
         try (PreparedStatement statement = connection.prepareStatement(sql);
              ResultSet resultSet = statement.executeQuery()) {
             while (resultSet.next()) {
-                linkPool.add(resultSet.getString(1));
+                return resultSet.getString(1);
             }
         }
-        return linkPool;
+        return null;
+    }
+
+    private static String getNextLinkThenDelete(Connection connection) throws SQLException {
+        String nextLink = getNextLink(connection, "select link from LINKS_TO_BE_PROCESSED");
+        if (nextLink != null) {
+            updateTable(connection, nextLink, "delete from LINKS_TO_BE_PROCESSED where LINK=?");
+        }
+        return nextLink;
     }
 
     @SuppressFBWarnings(value = "DMI_CONSTANT_DB_PASSWORD")
@@ -41,32 +47,19 @@ public class Main {
 
         Connection connection = DriverManager.getConnection(JDBC_URL, USER_NAME, PASSWORD);
 
-        while (true) {
-            List<String> linkPool = loadUrlsFromDatabase(connection, "select link from LINKS_TO_BE_PROCESSED");
-            if (linkPool.isEmpty()) {
-                break;
-            }
+        String nextLink;
+        while ((nextLink = getNextLinkThenDelete(connection)) != null) {
 
-            String link = linkPool.remove(linkPool.size() - 1);
-            deleteLinkFromDatabase(connection, link, "delete from LINKS_TO_BE_PROCESSED where LINK=?");
-
-            if (!isLinkProcessed(connection, link)) {
+            if (isLinkProcessed(connection, nextLink)) {
                 continue;
             }
 
-            if (isInterestingLink(link)) {
-                Document doc = getAndParseHtml(link);
+            if (isInterestingLink(nextLink)) {
+                Document doc = getAndParseHtml(nextLink);
                 parseUrlsFromPageAndStoreIntoDatabase(connection, doc);
                 storeInToDatabaseIfItIsNewsPage(doc);
-                insertLinkIntoDatabase(connection, link, "insert into LINKS_ALREADY_PROCESSED(link) values (?)");
+                updateTable(connection, nextLink, "insert into LINKS_ALREADY_PROCESSED(link) values (?)");
             }
-        }
-    }
-
-    private static void deleteLinkFromDatabase(Connection connection, String link, String sql) throws SQLException {
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setString(1, link);
-            statement.executeUpdate();
         }
     }
 
@@ -76,7 +69,7 @@ public class Main {
             if (href.startsWith("//")) {
                 href = "https:" + href;
             }
-            insertLinkIntoDatabase(connection, href, "insert into LINKS_TO_BE_PROCESSED(link) values (?)");
+            updateTable(connection, href, "insert into LINKS_TO_BE_PROCESSED(link) values (?)");
         }
     }
 
@@ -96,7 +89,7 @@ public class Main {
         return false;
     }
 
-    private static void insertLinkIntoDatabase(Connection connection, String link, String sql) throws SQLException {
+    private static void updateTable(Connection connection, String link, String sql) throws SQLException {
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, link);
             statement.executeUpdate();
