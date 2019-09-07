@@ -36,7 +36,7 @@ public class JdbcCrawlerDAOImpl implements ICrawlerDAO {
     }
 
     @Override
-    public String getNextLinkThenDelete() throws SQLException {
+    public synchronized String getNextLinkThenDelete() throws SQLException {
         String nextLink = getNextLink("select link from LINKS_TO_BE_PROCESSED LIMIT 1");
         if (nextLink != null) {
             updateTable(nextLink, "delete from LINKS_TO_BE_PROCESSED where LINK=?");

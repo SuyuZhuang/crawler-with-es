@@ -13,28 +13,35 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
-public class Crawler {
-    private static final OkHttpClient client = new OkHttpClient();
+public class Crawler extends Thread {
+    private OkHttpClient client;
 
-    ICrawlerDAO dao = new MyBatisCrawlerDAOImpl();
+    private ICrawlerDAO dao;
 
-    public void run() throws SQLException {
-        String nextLink;
-        while ((nextLink = dao.getNextLinkThenDelete()) != null) {
-            if (dao.isLinkProcessed(nextLink)) {
-                continue;
-            }
-            if (isInterestingLink(nextLink)) {
-                Document doc = getAndParseHtml(nextLink);
-                parseUrlsFromPageAndStoreIntoDatabase(doc);
-                storeInToDatabaseIfItIsNewsPage(doc, nextLink);
-                dao.insertLinkIntoProcessedLinkTable(nextLink);
-            }
-        }
+    public Crawler(OkHttpClient client, ICrawlerDAO dao) {
+        this.client = client;
+        this.dao = dao;
     }
 
-    public static void main(String[] args) throws SQLException {
-        new Crawler().run();
+    @Override
+    public void run() {
+        String nextLink;
+        try {
+            while ((nextLink = dao.getNextLinkThenDelete()) != null) {
+                if (dao.isLinkProcessed(nextLink)) {
+                    continue;
+                }
+                if (isInterestingLink(nextLink)) {
+                    Document doc = getAndParseHtml(nextLink);
+                    parseUrlsFromPageAndStoreIntoDatabase(doc);
+                    storeInToDatabaseIfItIsNewsPage(doc, nextLink);
+                    dao.insertLinkIntoProcessedLinkTable(nextLink);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     private void parseUrlsFromPageAndStoreIntoDatabase(Document doc) throws SQLException {
@@ -66,14 +73,14 @@ public class Crawler {
     }
 
 
-    private static Document getAndParseHtml(String link) {
+    private Document getAndParseHtml(String link) {
         Document doc = null;
         Request request = new Request.Builder()
                 .url(link)
                 .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101 Firefox/68.0")
                 .build();
 
-        try (Response response = client.newCall(request).execute()) {
+        try (Response response = this.client.newCall(request).execute()) {
             ResponseBody body = response.body();
             if (body != null) {
                 doc = Jsoup.parse(body.string());
