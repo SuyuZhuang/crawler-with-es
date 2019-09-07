@@ -1,6 +1,5 @@
 package com.github.hcsp;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import okhttp3.OkHttpClient;
 
 public class Main {
