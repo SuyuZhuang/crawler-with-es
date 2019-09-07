@@ -16,6 +16,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 public class Main {
     private static final OkHttpClient client = new OkHttpClient();
@@ -57,7 +58,7 @@ public class Main {
             if (isInterestingLink(nextLink)) {
                 Document doc = getAndParseHtml(nextLink);
                 parseUrlsFromPageAndStoreIntoDatabase(connection, doc);
-                storeInToDatabaseIfItIsNewsPage(doc);
+                storeInToDatabaseIfItIsNewsPage(connection, doc, nextLink);
                 updateTable(connection, nextLink, "insert into LINKS_ALREADY_PROCESSED(link) values (?)");
             }
         }
@@ -66,10 +67,15 @@ public class Main {
     private static void parseUrlsFromPageAndStoreIntoDatabase(Connection connection, Document doc) throws SQLException {
         for (Element aTag : doc.select("a")) {
             String href = aTag.attr("href");
+
             if (href.startsWith("//")) {
                 href = "https:" + href;
             }
-            updateTable(connection, href, "insert into LINKS_TO_BE_PROCESSED(link) values (?)");
+
+            if (!href.toLowerCase().startsWith("javascript")) {
+                updateTable(connection, href, "insert into LINKS_TO_BE_PROCESSED(link) values (?)");
+            }
+
         }
     }
 
@@ -97,13 +103,24 @@ public class Main {
     }
 
 
-    private static void storeInToDatabaseIfItIsNewsPage(Document doc) {
+    private static void storeInToDatabaseIfItIsNewsPage(Connection connection, Document doc, String link) throws SQLException {
         ArrayList<Element> articleTags = doc.select("article");
         if (!articleTags.isEmpty()) {
             for (Element articleElement : articleTags) {
-                System.out.println(articleElement.child(0).text());
+                String title = articleElement.child(0).text();
+                String content = articleElement.select("p").stream()
+                        .map(Element::text).collect(Collectors.joining("\n"));
+                System.out.println(title);
+                try(PreparedStatement statement = connection.prepareStatement("insert into NEWS(URL,TITLE,CONTENT,CREATED_AT,MODIFIED_AT) VALUES (?,?,?,NOW(),NOW())")) {
+                    statement.setString(1, link);
+                    statement.setString(2, title);
+                    statement.setString(3, content);
+                    statement.executeUpdate();
+                }
             }
         }
+
+
     }
 
     private static Document getAndParseHtml(String link) {
