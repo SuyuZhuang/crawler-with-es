@@ -1,0 +1,108 @@
+package com.github.hcsp;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.stream.Collectors;
+
+public class Crawler {
+    private static final OkHttpClient client = new OkHttpClient();
+
+    ICrawlerDAO dao = new JDBCCrawlerDAO();
+
+
+    public void run() throws SQLException {
+
+        String nextLink;
+        while ((nextLink = dao.getNextLinkThenDelete()) != null) {
+
+            if (dao.isLinkProcessed(nextLink)) {
+                continue;
+            }
+
+            if (isInterestingLink(nextLink)) {
+                Document doc = getAndParseHtml(nextLink);
+                parseUrlsFromPageAndStoreIntoDatabase(doc);
+                storeInToDatabaseIfItIsNewsPage(doc, nextLink);
+                dao.updateTable(nextLink, "insert into LINKS_ALREADY_PROCESSED(link) values (?)");
+            }
+        }
+    }
+
+    public static void main(String[] args) throws SQLException {
+        new Crawler().run();
+    }
+
+    private void parseUrlsFromPageAndStoreIntoDatabase(Document doc) throws SQLException {
+        for (Element aTag : doc.select("a")) {
+            String href = aTag.attr("href");
+
+            if (href.startsWith("//")) {
+                href = "https:" + href;
+            }
+
+            if (!href.toLowerCase().startsWith("javascript")) {
+                dao.updateTable(href, "insert into LINKS_TO_BE_PROCESSED(link) values (?)");
+            }
+
+        }
+    }
+
+    private void storeInToDatabaseIfItIsNewsPage(Document doc, String link) throws SQLException {
+        ArrayList<Element> articleTags = doc.select("article");
+        if (!articleTags.isEmpty()) {
+            for (Element articleElement : articleTags) {
+                String title = articleElement.child(0).text();
+                String content = articleElement.select("p").stream()
+                        .map(Element::text).collect(Collectors.joining("\n"));
+                System.out.println(title);
+                dao.insertNewsIntoDatabase(link, title, content);
+            }
+        }
+
+
+    }
+
+
+    private static Document getAndParseHtml(String link) {
+        Document doc = null;
+        Request request = new Request.Builder()
+                .url(link)
+                .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101 Firefox/68.0")
+                .build();
+
+        try (Response response = client.newCall(request).execute()) {
+            ResponseBody body = response.body();
+            if (body != null) {
+                doc = Jsoup.parse(body.string());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return doc;
+    }
+
+    private static boolean isInterestingLink(String link) {
+        return isNewsPageLink(link) || isIndexLink(link) && isNotLoginPage(link);
+    }
+
+    private static boolean isNotLoginPage(String link) {
+        return !link.contains("passport.sina.cn");
+    }
+
+    private static boolean isIndexLink(String link) {
+        return "https://sina.cn".equals(link);
+    }
+
+    private static boolean isNewsPageLink(String link) {
+        return link.contains("news.sina.cn");
+    }
+}
