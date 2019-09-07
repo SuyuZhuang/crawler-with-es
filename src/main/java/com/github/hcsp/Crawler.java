@@ -16,23 +16,19 @@ import java.util.stream.Collectors;
 public class Crawler {
     private static final OkHttpClient client = new OkHttpClient();
 
-    ICrawlerDAO dao = new JDBCCrawlerDAO();
-
+    ICrawlerDAO dao = new MyBatisCrawlerDAOImpl();
 
     public void run() throws SQLException {
-
         String nextLink;
         while ((nextLink = dao.getNextLinkThenDelete()) != null) {
-
             if (dao.isLinkProcessed(nextLink)) {
                 continue;
             }
-
             if (isInterestingLink(nextLink)) {
                 Document doc = getAndParseHtml(nextLink);
                 parseUrlsFromPageAndStoreIntoDatabase(doc);
                 storeInToDatabaseIfItIsNewsPage(doc, nextLink);
-                dao.updateTable(nextLink, "insert into LINKS_ALREADY_PROCESSED(link) values (?)");
+                dao.insertLinkIntoProcessedLinkTable(nextLink);
             }
         }
     }
@@ -44,13 +40,11 @@ public class Crawler {
     private void parseUrlsFromPageAndStoreIntoDatabase(Document doc) throws SQLException {
         for (Element aTag : doc.select("a")) {
             String href = aTag.attr("href");
-
             if (href.startsWith("//")) {
                 href = "https:" + href;
             }
-
             if (!href.toLowerCase().startsWith("javascript")) {
-                dao.updateTable(href, "insert into LINKS_TO_BE_PROCESSED(link) values (?)");
+                dao.insertLinkIntoToBeProcessedTable(href);
             }
 
         }
