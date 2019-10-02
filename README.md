@@ -2,11 +2,14 @@
 
 # 1 简介
 
-进度：当前项目实现了多线程的爬虫，但是还没有开始引入ElasticSearch做数据分析。
+**进度**：当前项目实现了多线程的爬虫，但是还没有开始引入ElasticSearch做数据分析。
 
-内容：爬取的内容是[手机新浪网](https://sina.cn)的所有新闻。
 
-数据库：当前所有数据是存储在H2数据库中。DAO层有两个实现，一个是MyBatisCrawlerDAOImpl.java，一个是JdbcCrawlerDAOImpl.java
+**内容**：爬取的内容是[手机新浪网](https://sina.cn)的所有新闻。
+
+
+
+**数据库**：当前所有数据是存储在H2数据库中。DAO层有两个实现，一个是MyBatisCrawlerDAOImpl.java，一个是JdbcCrawlerDAOImpl.java
 - JdbcCrawlerDAOImpl.java 最原始的实现，配置直接写进了Java类中
 - MyBatisCrawlerDAOImpl.java，当前实际使用的实现
 - 注意：由于jdbc链接是以绝对路径写的，所以下载代码后需要修改调整[config.xml](/src/main/resources/db/mybatis/config.xml)中URL的值。
@@ -38,9 +41,9 @@ create table NEWS
 );
 ```
 
-运行方法：
+**运行方法**：
 1. 下载或clone代码
-2. 刷新导入pom.xml中制定的依赖包
+2. 导入pom.xml中的依赖包
 3. 修改[config.xml](/src/main/resources/db/mybatis/config.xml)文件中url的值
 4. 修改[pom.xml]()文件中flyway-maven-plugin配置的jdbc_url值
 4. 根据[config.xml](/pom.xml)文件中的配置创建数据库
