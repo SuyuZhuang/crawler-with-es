@@ -53,7 +53,7 @@ public class Crawler extends Thread {
             if (href.startsWith("//")) {
                 href = "https:" + href;
             }
-            if (!href.toLowerCase().startsWith("javascript")) {
+            if (!href.toLowerCase().startsWith("javascript") && isInterestingLink(href)) {
                 dao.insertLinkIntoToBeProcessedTable(href);
             }
 
@@ -92,6 +92,7 @@ public class Crawler extends Thread {
                 doc = Jsoup.parse(body.string());
             }
         } catch (IOException e) {
+            System.out.println(link);
             e.printStackTrace();
         }
         return doc;
