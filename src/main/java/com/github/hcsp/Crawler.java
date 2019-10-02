@@ -45,6 +45,9 @@ public class Crawler extends Thread {
     }
 
     private void parseUrlsFromPageAndStoreIntoDatabase(Document doc) throws SQLException {
+        if (doc == null) {
+            return;
+        }
         for (Element aTag : doc.select("a")) {
             String href = aTag.attr("href");
             if (href.startsWith("//")) {
@@ -58,6 +61,9 @@ public class Crawler extends Thread {
     }
 
     private void storeInToDatabaseIfItIsNewsPage(Document doc, String link) throws SQLException {
+        if (doc == null) {
+            return;
+        }
         ArrayList<Element> articleTags = doc.select("article");
         if (!articleTags.isEmpty()) {
             for (Element articleElement : articleTags) {
