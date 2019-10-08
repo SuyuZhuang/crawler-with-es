@@ -62,9 +62,9 @@ create table NEWS
 ## 3 实现步骤(括号内为完成日期)
 0. （9.5）创项目，搭建骨架
 1. （9.6）添加okhttp依赖，进行冒烟测试
-2. （9.6）修改CI配置文件，保证circleCI正常运行
+2. （9.6）修改CI配置文件，保证circleCI正常运行,插件绑定到了compile阶段，`mvn compile`
 3. （9.6）使用两个ArrayList实现了基本的算法，能打印出新闻标题，做了小部分重构
-4. （9.6）添加spotbugs插件，修复潜在bug
+4. （9.6）添加spotbugs插件，修复潜在bug, 插件绑定到了verify阶段，`mvn verify`
 5. （9.7）使用H2数据库替换掉ArrayList实现，并进行小部分重构
 6. （9.7）引入flyway
 7. （9.7）完善算法，将标题、链接、文章内容放入数据库
