@@ -72,3 +72,4 @@ create table NEWS
 9. （9.7）为DAO层添加MyBatis实现
 10. （9.7）改造为多线程
 11. (10.2) 修复两处bug
+12. (10.15) 改为mysql数据库
