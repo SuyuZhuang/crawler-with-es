@@ -10,7 +10,7 @@ import org.jsoup.nodes.Element;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Crawler extends Thread {

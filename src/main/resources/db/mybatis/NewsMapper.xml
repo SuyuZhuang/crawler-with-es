@@ -8,15 +8,15 @@
     </select>
 
     <delete id="deleteOneLink" parameterType="String">
-        delete from LINKS_TO_BE_PROCESSED where LINK=#{link}
+        delete from LINKS_TO_BE_PROCESSED where link=#{link}
     </delete>
     
     <insert id="insertNews" parameterType="com.github.hcsp.News">
-        insert into NEWS(URL,TITLE,CONTENT,CREATED_AT,MODIFIED_AT) VALUES (#{url},#{title},#{content},NOW(),NOW())
+        insert into news(url,title,content,created_at,modified_at) VALUES (#{url},#{title},#{content},NOW(),NOW())
     </insert>
 
     <select id="countProcessedLink" parameterType="String" resultType="Integer">
-      select count(*) from LINKS_ALREADY_PROCESSED where LINK=#{link}
+      select count(*) from LINKS_ALREADY_PROCESSED where link=#{link}
     </select>
 
     <insert id="insertLinkIntoProcessedLinkTable" parameterType="String">

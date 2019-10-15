@@ -1,19 +1,12 @@
-create table LINKS_ALREADY_PROCESSED
-(
-	LINK VARCHAR(2000)
-);
+create table LINKS_ALREADY_PROCESSED( link VARCHAR(2000));
 
-create table LINKS_TO_BE_PROCESSED
-(
-	LINK VARCHAR(2000)
-);
+create table LINKS_TO_BE_PROCESSED(link VARCHAR(2000));
 
-create table NEWS
-(
-	ID BIGINT AUTO_INCREMENT primary key,
-	TITLE TEXT,
-	CONTENT TEXT,
-	URL VARCHAR(2000),
-	CREATED_AT TIMESTAMP,
-	MODIFIED_AT TIMESTAMP
+create table news(
+	id bigint primary key  auto_increment ,
+	title TEXT,
+	content TEXT,
+	url varchar(2000),
+	created_at timestamp default now(),
+	modified_at timestamp default now()
 );
