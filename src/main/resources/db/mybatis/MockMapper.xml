@@ -4,12 +4,12 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.github.hcsp.MockMapper">
     <insert id="insertNews" parameterType="com.github.hcsp.News">
-        insert into news(url,title,content,created_at,modified_at) VALUES
-        (#{url},#{title},#{content},#{createdAt},#{modifiedAt})
+        insert into news(url,title,content,created_at,modified_at,uuid,snow) VALUES
+        (#{url},#{title},#{content},#{createdAt},#{modifiedAt},#{uuid},#{snow})
     </insert>
 
     <select id="selectNews" resultType="com.github.hcsp.News">
-        select id,url,title,content,created_at,modified_at
+        select id,url,title,content,created_at,modified_at,uuid,snow
         from news
     </select>
 </mapper>

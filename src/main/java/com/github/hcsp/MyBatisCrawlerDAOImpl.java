@@ -47,6 +47,13 @@ public class MyBatisCrawlerDAOImpl implements ICrawlerDAO {
     }
 
     @Override
+    public void insertNewsVOIntoDatabase(News vo) throws SQLException {
+        try (SqlSession session = sqlSessionFactory.openSession(true)) {
+            session.insert("com.github.hcsp.NewsMapper.insertNews", vo);
+        }
+    }
+
+    @Override
     public boolean isLinkProcessed(String link) throws SQLException {
         try (SqlSession session = sqlSessionFactory.openSession()) {
             int count = session.selectOne("com.github.hcsp.NewsMapper.countProcessedLink", link);

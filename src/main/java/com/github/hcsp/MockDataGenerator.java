@@ -1,5 +1,6 @@
 package com.github.hcsp;
 
+import cn.hutool.core.util.IdUtil;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
@@ -44,6 +45,8 @@ public class MockDataGenerator {
                     currentTime = currentTime.minusSeconds(random.nextInt(3600 * 24 * 365));
                     newsToBeInsert.setCreatedAt(currentTime);
                     newsToBeInsert.setModifiedAt(currentTime);
+                    newsToBeInsert.setUuid(IdUtil.randomUUID());
+                    newsToBeInsert.setSnow(IdUtil.getSnowflake(1,3).nextId());
                     session.insert("com.github.hcsp.MockMapper.insertNews",
                             newsToBeInsert);
                     if (count % 2000 == 0) {
@@ -53,6 +56,7 @@ public class MockDataGenerator {
                 }
             } catch (Exception e) {
                 session.rollback();
+                throw new RuntimeException(e);
             }
 
             session.commit();

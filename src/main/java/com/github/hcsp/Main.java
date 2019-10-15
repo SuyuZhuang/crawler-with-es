@@ -7,7 +7,7 @@ public class Main {
         OkHttpClient client = new OkHttpClient();
         ICrawlerDAO dao = new MyBatisCrawlerDAOImpl();
 
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 10; i++) {
             new Crawler(client, dao).start();
         }
     }

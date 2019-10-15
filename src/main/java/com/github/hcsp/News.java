@@ -10,6 +10,8 @@ public class News {
     private String content;
     private Instant createdAt;
     private Instant modifiedAt;
+    private String uuid;
+    private Long snow;
 
     public News() {
     }
@@ -18,6 +20,14 @@ public class News {
         this.url = url;
         this.title = title;
         this.content = content;
+    }
+
+    public News(String url, String title, String content, String uuid, Long snow) {
+        this.url = url;
+        this.title = title;
+        this.content = content;
+        this.uuid = uuid;
+        this.snow = snow;
     }
 
     public Integer getId() {
@@ -66,5 +76,21 @@ public class News {
 
     public void setModifiedAt(Instant modifiedAt) {
         this.modifiedAt = modifiedAt;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
+
+    public Long getSnow() {
+        return snow;
+    }
+
+    public void setSnow(Long snow) {
+        this.snow = snow;
     }
 }

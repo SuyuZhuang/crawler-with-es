@@ -12,7 +12,8 @@
     </delete>
     
     <insert id="insertNews" parameterType="com.github.hcsp.News">
-        insert into news(url,title,content,created_at,modified_at) VALUES (#{url},#{title},#{content},NOW(),NOW())
+        insert into news(url,title,content,created_at,modified_at,uuid,snow) VALUES
+         (#{url},#{title},#{content},NOW(),NOW(),#{uuid},#{snow})
     </insert>
 
     <select id="countProcessedLink" parameterType="String" resultType="Integer">

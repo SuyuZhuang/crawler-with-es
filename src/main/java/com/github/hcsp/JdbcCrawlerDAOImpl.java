@@ -62,6 +62,11 @@ public class JdbcCrawlerDAOImpl implements ICrawlerDAO {
     }
 
     @Override
+    public void insertNewsVOIntoDatabase(News vo) throws SQLException {
+// 暂时不实现
+    }
+
+    @Override
     public boolean isLinkProcessed(String link) throws SQLException {
         ResultSet resultSet = null;
         try (PreparedStatement statement = connection.prepareStatement("select link from LINKS_ALREADY_PROCESSED where LINK=?")) {

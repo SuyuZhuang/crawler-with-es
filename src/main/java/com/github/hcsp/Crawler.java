@@ -1,5 +1,7 @@
 package com.github.hcsp;
 
+import cn.hutool.core.lang.Snowflake;
+import cn.hutool.core.util.IdUtil;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -17,6 +19,8 @@ public class Crawler extends Thread {
     private OkHttpClient client;
 
     private ICrawlerDAO dao;
+
+    private Snowflake snowflake = IdUtil.getSnowflake(1L,2L);
 
     public Crawler(OkHttpClient client, ICrawlerDAO dao) {
         this.client = client;
@@ -71,7 +75,9 @@ public class Crawler extends Thread {
                 String content = articleElement.select("p").stream()
                         .map(Element::text).collect(Collectors.joining("\n"));
                 System.out.println(title);
-                dao.insertNewsIntoDatabase(link, title, content);
+                String uuid = IdUtil.randomUUID();
+                News vo = new News(link,title,content,uuid,snowflake.nextId());
+                dao.insertNewsVOIntoDatabase(vo);
             }
         }
 

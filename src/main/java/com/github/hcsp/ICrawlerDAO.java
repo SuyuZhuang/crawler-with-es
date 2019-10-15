@@ -7,6 +7,8 @@ public interface ICrawlerDAO {
 
     void insertNewsIntoDatabase(String link, String title, String content) throws SQLException;
 
+    void insertNewsVOIntoDatabase(News vo) throws SQLException;
+
     boolean isLinkProcessed(String link) throws SQLException;
 
     void insertLinkIntoProcessedLinkTable(String nextLink) throws SQLException;
