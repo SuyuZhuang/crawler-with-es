@@ -1,7 +1,6 @@
 package com.github.hcsp;
 
 import java.time.Instant;
-import java.util.Date;
 
 public class News {
     private Integer id;
@@ -28,6 +27,17 @@ public class News {
         this.content = content;
         this.uuid = uuid;
         this.snow = snow;
+    }
+
+    public News(News old) {
+        this.id = old.id;
+        this.url = old.url;
+        this.title = old.title;
+        this.content = old.content;
+        this.uuid = old.uuid;
+        this.snow = old.snow;
+        this.createdAt = old.createdAt;
+        this.modifiedAt = old.modifiedAt;
     }
 
     public Integer getId() {

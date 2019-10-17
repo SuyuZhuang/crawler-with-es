@@ -48,21 +48,21 @@
 <!--            <version>1.4.199</version>-->
 <!--            <scope>compile</scope>-->
 <!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>mysql</groupId>-->
-<!--            <artifactId>mysql-connector-java</artifactId>-->
-<!--            <version>8.0.17</version>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.17</version>
+        </dependency>
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
             <version>4.6.10</version>
         </dependency>
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>42.2.8</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.postgresql</groupId>-->
+<!--            <artifactId>postgresql</artifactId>-->
+<!--            <version>42.2.8</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>com.github.spotbugs</groupId>
             <artifactId>spotbugs-annotations</artifactId>
@@ -74,6 +74,12 @@
             <artifactId>mybatis</artifactId>
             <version>3.5.2</version>
         </dependency>
+        <dependency>
+            <groupId>org.elasticsearch.client</groupId>
+            <artifactId>elasticsearch-rest-high-level-client</artifactId>
+            <version>7.4.0</version>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -105,8 +111,8 @@
                 <artifactId>flyway-maven-plugin</artifactId>
                 <version>6.0.6</version>
                 <configuration>
-                    <url>jdbc:postgresql://127.0.0.1:5432/news</url>
-                    <user>postgres</user>
+                    <url>jdbc:mysql://localhost:3306/news</url>
+                    <user>root</user>
                     <password>root</password>
                 </configuration>
             </plugin>
