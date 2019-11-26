@@ -37,6 +37,7 @@ public class MockDataGenerator {
             int count = TARGET_ROW_COUNT - news.size();
             Random random = new Random();
             try {
+                // 先判断>0再--
                 while (count-- > 0) {
                     int index = random.nextInt(news.size());
                     News newsToBeInsert = news.get(index);
